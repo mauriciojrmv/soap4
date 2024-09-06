@@ -1,0 +1,13 @@
+necesito que te guies del siguiente codigo y hagas los cambios necesarios.
+Mi ingeniero me pidió agregar funcionalidades a lo que ya tenemos implementado:
+1. Registro: sería lo que tenemos ya implementado pero tendríamos que añadir campos de login y contraseña al formulario para el login del cliente.
+2. Login: una página para que un cliente registrado pueda ingresar al uso de servicios. 
+3.cuenta: será una tabla distinta y cada cliente registrado podrá crearse cuentas ya sea en dólares o bolivianos. En esta tabla se manejará el saldo de las cuentas de los clientes. 
+4. Transacciones: será una tabla relacional ya que un cliente podrá realizar muchas transacciones y una cuenta también se verá afectada por estas transacciones. Las transacciones que Usaremos serán las siguientes deposito y retiro. 
+Y debemos captar información relevante de la transacción como la fecha y hora de transacción.
+Tomar en cuenta que tal vez sea relevante crear un token en esta parte para que no se dupliquen transacciones por error. 
+5. Cuando el cliente hace login debe tenes las siguientes servicios disponibles para poder realizar: crear cuenta, deposito, retiro. 
+Para todo esto debemos quiero seguir manejando la estructura que tenemos y seguir recibiendo los mensajes de nivel 1, 2 y 3 en caso de éxito o error de cada uno de los niveles. 
+
+
+perfecto estoy contento con el registro de clientes que hemos creado. ahora necesitamos hacer el login.
