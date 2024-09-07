@@ -113,7 +113,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 # Modo de ejecucion:
 PC1, PC2, PC3: Si se implementa en diferentes PCs, se debe cambiar la IP del servidor y puerto al cual se conectara cada cliente.
 
-implementare un archivo donde podamos editar este redireccionamiento directamente.
+implementare un archivo donde podamos editar este redireccionamiento. Para no hacer cambio a direccion a cada uno de los archivos front.
 
 # Ejecucion del Proyecto
 
