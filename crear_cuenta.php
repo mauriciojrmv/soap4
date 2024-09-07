@@ -8,16 +8,16 @@ if (!isset($_SESSION['login'])) {
 $message = '';
 $message_type = '';
 
+// Incluir la función para obtener el cliente SOAP
+include 'soapClientFactory.php';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tipo_cuenta = htmlspecialchars($_POST['tipo_cuenta']); // Puede ser "bolivianos" o "dólares"
     $token = md5($_SESSION['login'] . $tipo_cuenta); // Generar un token único para la cuenta
 
     try {
-        $client = new SoapClient(null, [
-            'location' => "http://localhost:8000/soap4/server.php",
-            'uri' => "urn:PersonService",
-            'trace' => 1
-        ]);
+        // Obtener el cliente SOAP usando la función
+    $client = getSoapClient();
 
         // Verificar si la cuenta ya existe
         $response = $client->crearCuenta($_SESSION['login'], $tipo_cuenta, $token);

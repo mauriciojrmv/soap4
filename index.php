@@ -3,6 +3,9 @@ $message = '';
 $message_type = '';
 $clear_form = false;
 
+// Incluir la función para obtener el cliente SOAP
+include 'soapClientFactory.php';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Campos obligatorios, incluyendo login y contraseña
     $fields = ['name', 'paternal_surname', 'maternal_surname', 'id_number', 'birth_date', 'gender', 'birth_place', 'marital_status', 'profession', 'address', 'login', 'password'];
@@ -33,11 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $token = md5($nombre . $apellido_paterno . $apellido_materno . $numero_carnet);
 
         try {
-            $client = new SoapClient(null, [
-                'location' => "http://localhost:8000/soap4/server.php",  // Cambia por tu servidor SOAP
-                'uri' => "urn:PersonService",
-                'trace' => 1
-            ]);
+            // Obtener el cliente SOAP usando la función
+            $client = getSoapClient();
 
             // Enviar datos al servidor para el registro
             $response = $client->registerPerson(

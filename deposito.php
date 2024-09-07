@@ -8,12 +8,12 @@ if (!isset($_SESSION['login'])) {
 $message = '';
 $message_type = '';
 
+// Incluir la función para obtener el cliente SOAP
+include 'soapClientFactory.php';
+
 try {
-    $client = new SoapClient(null, [
-        'location' => "http://localhost:8000/soap4/server.php",
-        'uri' => "urn:PersonService",
-        'trace' => 1
-    ]);
+    // Obtener el cliente SOAP usando la función
+    $client = getSoapClient();
 
     // Obtener las cuentas del cliente
     $cuentas = $client->getCuentasCliente($_SESSION['login']);

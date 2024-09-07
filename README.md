@@ -113,12 +113,16 @@ SET FOREIGN_KEY_CHECKS = 1;
 # Modo de ejecucion:
 PC1, PC2, PC3: Si se implementa en diferentes PCs, se debe cambiar la IP del servidor y puerto al cual se conectara cada cliente.
 
-implementare un archivo donde podamos editar este redireccionamiento. Para no hacer cambio a direccion a cada uno de los archivos front.
+Para la PC1 se cambia la direccion del direccionamiento hacia el server en **soapClientFactory.php**
+
+Para la PC2 se cambia el direccionamiento hacia la bd en **server.php**
+
+PC3 hacemos las configuraciones pertinentes para la conexion a la base de datos en **bd.php**
 
 # Ejecucion del Proyecto
 
-Se debe ejecutar el XAMPP y asegurarse que tengamos activa la extension Soap en nuestro apache. esto se activa en config>php.ini> aqui se debe buscar la linea ;extension=soap  y quitar el ";"
+Se debe ejecutar el XAMPP y asegurarse que tengamos activa la extension Soap en nuestro apache. esto se activa en **config>php.ini>** aqui se debe buscar la linea **;extension=soap**  y quitar el **";"**
 
-despues debemos asignar la ip a nuestro APACHE que sera donde se dirigira el trafico
+despues debemos asignar la ip asignada a nuestra pc por la red a nuestro APACHE que sera donde se dirigira el trafico
 
-config>http.conf  aqui se debe buscar la linea listen e introducimos nuestra ip asignada en la red.
+**config>http.conf**  aqui se debe buscar la linea listen e introducimos nuestra ip y puerto que ocupamos en la red.

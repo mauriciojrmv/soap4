@@ -3,6 +3,9 @@ session_start(); // Iniciar sesión para guardar datos de login
 $message = '';
 $message_type = '';
 
+// Incluir la función para obtener el cliente SOAP
+include 'soapClientFactory.php';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login = htmlspecialchars($_POST['login']);
     $password = $_POST['password'];
@@ -12,12 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $message_type = 'error';
     } else {
         try {
-            // Crear cliente SOAP para conectar con el servidor
-            $client = new SoapClient(null, [
-                'location' => "http://localhost:8000/soap4/server.php", // Cambia según tu servidor SOAP
-                'uri' => "urn:PersonService",
-                'trace' => 1
-            ]);
+            // Usar la función para obtener el cliente SOAP
+            $client = getSoapClient();
 
             // Enviar login y contraseña al servidor para autenticación
             $response = $client->loginPerson($login, $password);
