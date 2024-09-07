@@ -21,7 +21,7 @@ class DatabaseService {
             $stmt->execute(['token' => $token]);
             return $stmt->fetchColumn() > 0;
         } catch (PDOException $e) {
-            throw new SoapFault("Server", "Nivel 3: Error - Problema al verificar la existencia de la persona: " . $e->getMessage());
+            throw new SoapFault("Server", "Nivel 3: Error - Esta persona ya existe: " . $e->getMessage());
         }
     }
 
@@ -32,7 +32,7 @@ class DatabaseService {
             $stmt->execute(['numero_carnet' => $numero_carnet]);
             return $stmt->fetchColumn() > 0;
         } catch (PDOException $e) {
-            throw new SoapFault("Server", "Nivel 3: Error - Problema al verificar la existencia del carnet: " . $e->getMessage());
+            throw new SoapFault("Server", "Nivel 3: Error - Este carnet ya fue utilizado: " . $e->getMessage());
         }
     }
 
@@ -43,7 +43,7 @@ class DatabaseService {
             $stmt->execute(['login' => $login]);
             return $stmt->fetchColumn() > 0;
         } catch (PDOException $e) {
-            throw new SoapFault("Server", "Nivel 3: Error - Problema al verificar la existencia del login: " . $e->getMessage());
+            throw new SoapFault("Server", "Nivel 3: Error - Este login ya fue utilizado: " . $e->getMessage());
         }
     }
     
@@ -108,6 +108,94 @@ class DatabaseService {
             throw new SoapFault("Server", "Nivel 3: Error - Problema al autenticar el login: " . $e->getMessage());
         }
     }
+
+    // Verificar si ya existe una cuenta del mismo tipo para este cliente
+    public function checkIfAccountExists($login, $tipo_cuenta) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM cuentas WHERE login = :login AND tipo_cuenta = :tipo_cuenta");
+            $stmt->execute(['login' => $login, 'tipo_cuenta' => $tipo_cuenta]);
+            return $stmt->fetchColumn() > 0;
+        } catch (PDOException $e) {
+            throw new SoapFault("Server", "Nivel 3: Error - Problema al verificar la existencia de la cuenta: " . $e->getMessage());
+        }
+    }
+
+    // Insertar nueva cuenta en la base de datos
+    public function insertAccount($login, $tipo_cuenta, $token) {
+        try {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO cuentas (login, tipo_cuenta, token, saldo, creado_en)
+                VALUES (:login, :tipo_cuenta, :token, 0, NOW())
+            ");
+            $result = $stmt->execute([
+                'login' => $login,
+                'tipo_cuenta' => $tipo_cuenta,
+                'token' => $token
+            ]);
+            return $result;
+        } catch (PDOException $e) {
+            throw new SoapFault("Server", "Nivel 3: Error - Problema al insertar la cuenta: " . $e->getMessage());
+        }
+    }
+
+    // Obtener las cuentas del cliente
+    public function getCuentasCliente($login) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT id, tipo_cuenta, saldo FROM cuentas WHERE login = :login");
+            $stmt->execute(['login' => $login]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new SoapFault("Server", "Nivel 3: Error - Problema al obtener las cuentas del cliente: " . $e->getMessage());
+        }
+    }
+
+    // Insertar una transacción de depósito
+    public function depositar($cuenta_id, $monto, $token) {
+        try {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO transacciones (cuenta_id, tipo_transaccion, monto, token) 
+                VALUES (:cuenta_id, 'deposito', :monto, :token)
+            ");
+            $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
+
+            // Actualizar el saldo de la cuenta
+            $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo + :monto WHERE id = :cuenta_id");
+            $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
+
+            return true;
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23000') {
+                throw new SoapFault("Client", "Nivel 2: Error - Esta transacción ya existe.");
+            } else {
+                throw new SoapFault("Server", "Nivel 3: Error - Problema al realizar el depósito: " . $e->getMessage());
+            }
+        }
+    }
+
+    // Insertar una transacción de retiro
+    public function retirar($cuenta_id, $monto, $token) {
+        try {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO transacciones (cuenta_id, tipo_transaccion, monto, token) 
+                VALUES (:cuenta_id, 'retiro', :monto, :token)
+            ");
+            $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
+
+            // Actualizar el saldo de la cuenta
+            $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo - :monto WHERE id = :cuenta_id");
+            $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
+
+            return true;
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23000') {
+                throw new SoapFault("Client", "Nivel 2: Error - Esta transacción ya existe.");
+            } else {
+                throw new SoapFault("Server", "Nivel 3: Error - Problema al realizar el retiro: " . $e->getMessage());
+            }
+        }
+    }
+
+
 }
 
 // Configuración del servidor SOAP en PC3

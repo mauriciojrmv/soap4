@@ -12,8 +12,7 @@ Este proyecto implementa un sistema de registro distribuido utilizando el metodo
 
 ## Arquitectura del proyecto
 El proyecto esta dividido en tres componentes principales:
-
-# 1. index.php styles.css
+# 1. index.php styles.css login.php dashboard.php logout.php
 Este archivo actua como ntermediario e interfaz html (el formulario que llena el usiario) que conecta con el servidor SOAP.
 
 Generacion de tokens:
@@ -56,21 +55,57 @@ CREATE DATABASE person_db;
 
 USE person_db;
 
-CREATE TABLE personas (
+CREATE TABLE clientes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    apellido_paterno VARCHAR(255) NOT NULL,
-    apellido_materno VARCHAR(255) NOT NULL,
-    numero_carnet VARCHAR(255) NOT NULL UNIQUE,
+    nombre VARCHAR(50) NOT NULL,
+    apellido_paterno VARCHAR(50) NOT NULL,
+    apellido_materno VARCHAR(50) NOT NULL,
+    numero_carnet VARCHAR(15) UNIQUE NOT NULL, -- Campo obligatorio y único
     fecha_nacimiento DATE NOT NULL,
-    sexo CHAR(1) NOT NULL,
-    lugar_nacimiento VARCHAR(255) NOT NULL,
-    estado_civil CHAR(1) NOT NULL,
-    profesion VARCHAR(255) NOT NULL,
-    domicilio VARCHAR(255) NOT NULL,
-    token VARCHAR(255) NOT NULL,
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    sexo ENUM('M', 'F') NOT NULL,
+    lugar_nacimiento VARCHAR(50) NOT NULL,
+    estado_civil ENUM('S', 'C', 'D', 'V') NOT NULL,
+    profesion VARCHAR(50) NOT NULL,
+    domicilio VARCHAR(100) NOT NULL,
+    login VARCHAR(50) UNIQUE NOT NULL, -- Campo obligatorio y único
+    password VARCHAR(255) NOT NULL, -- Contraseña encriptada
+    token VARCHAR(64) UNIQUE NOT NULL, -- Token único y obligatorio
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación
 );
+
+CREATE TABLE cuentas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    login VARCHAR(50) NOT NULL,         -- Relacionado al cliente
+    tipo_cuenta ENUM('bolivianos', 'dolares') NOT NULL,  -- Tipo de cuenta
+    token VARCHAR(255) NOT NULL,        -- Token único para la cuenta
+    saldo DECIMAL(10, 2) DEFAULT 0,     -- Saldo de la cuenta, puede empezar en 0
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación
+);
+
+CREATE TABLE transacciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cuenta_id INT NOT NULL,
+    tipo_transaccion ENUM('deposito', 'retiro') NOT NULL,
+    monto DECIMAL(10, 2) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cuenta_id) REFERENCES cuentas(id)
+);
+
+
+### En caso de equivocarse y querer eliminar alguna tabla
+USE person_db;
+
+-- Desactivar las restricciones de claves foráneas temporalmente para eliminar las tablas
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Eliminar tablas
+DROP TABLE IF EXISTS transacciones;
+DROP TABLE IF EXISTS cuentas;
+DROP TABLE IF EXISTS clientes;
+
+-- Activar nuevamente las restricciones de claves foráneas
+SET FOREIGN_KEY_CHECKS = 1;
 
 
 # Modo de ejecucion:

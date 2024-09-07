@@ -15,6 +15,13 @@ if (!isset($_SESSION['login'])) {
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+     <!-- Navbar -->
+     <nav class="navbar">
+        <ul>
+            <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="logout.php">Cerrar Sesión</a></li>
+        </ul>
+    </nav>
     <div class="container" id="container">
         <div class="left-side expanded" id="left-side">
             <h2>Bienvenido, <?= htmlspecialchars($_SESSION['login']) ?>!</h2>

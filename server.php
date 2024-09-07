@@ -64,6 +64,57 @@ class PersonService {
         }
     }
 
+    // Método para crear una cuenta
+    public function crearCuenta($login, $tipo_cuenta, $token) {
+        try {
+            // Verificar si ya existe una cuenta del mismo tipo para este cliente
+            $cuentaExiste = $this->remoteCall('checkIfAccountExists', [$login, $tipo_cuenta]);
+            if ($cuentaExiste) {
+                throw new SoapFault("Client", "Nivel 2: Error - Ya tienes una cuenta en $tipo_cuenta.");
+            }
+
+            // Crear la cuenta si no existe
+            $result = $this->remoteCall('insertAccount', [$login, $tipo_cuenta, $token]);
+
+            if ($result !== true) {
+                throw new Exception("Error al crear la cuenta.");
+            }
+
+            return "success";
+        } catch (SoapFault $e) {
+            throw $e;  // Propagar errores de nivel 2 o 3
+        } catch (Exception $e) {
+            throw new SoapFault("Server", "Nivel 2: Error - " . $e->getMessage());
+        }
+    }
+
+    // Obtener las cuentas de un cliente
+    public function getCuentasCliente($login) {
+        try {
+            return $this->remoteCall('getCuentasCliente', [$login]);
+        } catch (SoapFault $e) {
+            throw new SoapFault("Server", "Nivel 2: Error - " . $e->getMessage());  // Manejo de errores de Nivel 2 o 3
+        }
+    }
+
+    // Realizar un depósito en una cuenta
+    public function depositar($cuenta_id, $monto, $token) {
+        try {
+            return $this->remoteCall('depositar', [$cuenta_id, $monto, $token]);
+        } catch (SoapFault $e) {
+            throw new SoapFault("Server", "Nivel 2: Error - " . $e->getMessage());  // Manejo de errores de Nivel 2 o 3
+        }
+    }
+
+    // Realizar un depósito en una cuenta
+    public function retirar($cuenta_id, $monto, $token) {
+        try {
+            return $this->remoteCall('retirar', [$cuenta_id, $monto, $token]);
+        } catch (SoapFault $e) {
+            throw new SoapFault("Server", "Nivel 2: Error - " . $e->getMessage());  // Manejo de errores de Nivel 2 o 3
+        }
+    }
+
     private function remoteCall($method, $params) {
         try {
             $client = new SoapClient(null, [

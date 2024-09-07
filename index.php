@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </script>";
             } else {
                 // Nivel 2: Error en el servidor SOAP
-                $message = "Nivel 2: Error - No se pudo realizar la tarea en el servidor. Detalle: " . $e->getMessage();
+                $message = "Detalle: " . $e->getMessage();
                 $message_type = 'error';
             }
         }
@@ -97,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <li><a href="login.php">Login</a></li>
         </ul>
     </nav>
+
     <div class="container" id="container">
         <div class="left-side" id="left-side">
             <h2>Bienvenido</h2>
