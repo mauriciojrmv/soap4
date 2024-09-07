@@ -113,7 +113,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 # Modo de ejecucion:
 PC1, PC2, PC3: Si se implementa en diferentes PCs, se debe cambiar la IP del servidor y puerto al cual se conectara cada cliente.
 
-Para la PC1 se cambia la direccion del direccionamiento hacia el server en **soapClientFactory.php**
+Para la PC1 se cambia la ruta y puerto de direccionamiento hacia el server en **soapClientFactory.php**
 
 Para la PC2 se cambia el direccionamiento hacia la bd en **server.php**
 
