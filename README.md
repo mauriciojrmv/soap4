@@ -12,7 +12,7 @@ Este proyecto implementa un sistema de registro distribuido utilizando el metodo
 
 ## Arquitectura del proyecto
 El proyecto esta dividido en tres componentes principales:
-# 1. index.php styles.css login.php dashboard.php logout.php crear_cuenta.php deposito.php retiro.php
+# 1. index.php, styles.css, login.php, dashboard.php, logout.php, crear_cuenta.php, deposito.php, retiro.php, soapClientFactory.php
 Estos archivos actuan como intermediario e interfaz html (el formulario que llena el usuario) que conecta con el servidor SOAP.
 
 Generacion de tokens:
