@@ -31,7 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $message_type = 'error';
         }
     } catch (SoapFault $e) {
-        if (strpos($e->getMessage(), 'Could not connect to host') !== false) {
+         // Capturar el mensaje específico de XML y manejarlo como un error de nivel 2
+         if (strpos($e->getMessage(), 'looks like we got no XML document') !== false) {
+            $message = "Nivel 2: Error - No se recibió una respuesta válida del servidor. Intente nuevamente.";
+            $message_type = 'error';
+        } elseif (strpos($e->getMessage(), 'Could not connect to host') !== false) {
             // Nivel 1: Error al intentar conectarse al servidor SOAP
             $message = "Nivel 1: Error - No se pudo conectar al servidor. Intentando nuevamente en 10 segundos...";
             $message_type = 'error';

@@ -174,26 +174,41 @@ class DatabaseService {
 
     // Insertar una transacción de retiro
     public function retirar($cuenta_id, $monto, $token) {
-        try {
-            $stmt = $this->pdo->prepare("
-                INSERT INTO transacciones (cuenta_id, tipo_transaccion, monto, token) 
-                VALUES (:cuenta_id, 'retiro', :monto, :token)
-            ");
-            $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
+    try {
+        // Verificar si la cuenta tiene saldo suficiente
+        $stmt = $this->pdo->prepare("SELECT saldo FROM cuentas WHERE id = :cuenta_id");
+        $stmt->execute(['cuenta_id' => $cuenta_id]);
+        $saldo = $stmt->fetchColumn();
 
-            // Actualizar el saldo de la cuenta
-            $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo - :monto WHERE id = :cuenta_id");
-            $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
+        if ($saldo === false) {
+            throw new SoapFault("Client", "Nivel 2: Error - Cuenta no encontrada.");
+        }
 
-            return true;
-        } catch (PDOException $e) {
-            if ($e->getCode() == '23000') {
-                throw new SoapFault("Client", "Nivel 2: Error - Esta transacción ya existe.");
-            } else {
-                throw new SoapFault("Server", "Nivel 3: Error - Problema al realizar el retiro: " . $e->getMessage());
-            }
+        // Validar si hay suficiente saldo
+        if ($saldo < $monto) {
+            throw new SoapFault("Client", "Nivel 2: Error - Fondos insuficientes. Saldo disponible: $saldo.");
+        }
+
+        // Si hay suficiente saldo, proceder con el retiro
+        $stmt = $this->pdo->prepare("
+            INSERT INTO transacciones (cuenta_id, tipo_transaccion, monto, token) 
+            VALUES (:cuenta_id, 'retiro', :monto, :token)
+        ");
+        $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
+
+        // Actualizar el saldo de la cuenta
+        $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo - :monto WHERE id = :cuenta_id");
+        $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
+
+        return true;
+    } catch (PDOException $e) {
+        if ($e->getCode() == '23000') {
+            throw new SoapFault("Client", "Nivel 2: Error - Esta transacción ya existe.");
+        } else {
+            throw new SoapFault("Server", "Nivel 3: Error - Problema al realizar el retiro: " . $e->getMessage());
         }
     }
+}
 
 
 }

@@ -106,12 +106,12 @@ class PersonService {
         }
     }
 
-    // Realizar un depósito en una cuenta
+    // Realizar un retiro en una cuenta
     public function retirar($cuenta_id, $monto, $token) {
         try {
             return $this->remoteCall('retirar', [$cuenta_id, $monto, $token]);
         } catch (SoapFault $e) {
-            throw new SoapFault("Server", "Nivel 2: Error - " . $e->getMessage());  // Manejo de errores de Nivel 2 o 3
+            throw new SoapFault("Server", "Nivel 2: Error - " . $e->getMessage());
         }
     }
 
