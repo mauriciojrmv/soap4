@@ -152,16 +152,26 @@ class DatabaseService {
     // Insertar una transacción de depósito
     public function depositar($cuenta_id, $monto, $token) {
         try {
+            // Verificar si la cuenta existe
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM cuentas WHERE id = :cuenta_id");
+            $stmt->execute(['cuenta_id' => $cuenta_id]);
+            $exists = $stmt->fetchColumn();
+    
+            if ($exists == 0) {
+                throw new SoapFault("Client", "Nivel 2: Error - Cuenta no encontrada.");
+            }
+    
+            // Insertar la transacción de depósito
             $stmt = $this->pdo->prepare("
                 INSERT INTO transacciones (cuenta_id, tipo_transaccion, monto, token) 
                 VALUES (:cuenta_id, 'deposito', :monto, :token)
             ");
             $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
-
+    
             // Actualizar el saldo de la cuenta
             $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo + :monto WHERE id = :cuenta_id");
             $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
-
+    
             return true;
         } catch (PDOException $e) {
             if ($e->getCode() == '23000') {

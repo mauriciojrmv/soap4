@@ -4,7 +4,7 @@ $message = '';
 $message_type = '';
 
 // Incluir la función para obtener el cliente SOAP
-include 'soapClientFactory.php';
+include 'soapClient.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login = htmlspecialchars($_POST['login']);

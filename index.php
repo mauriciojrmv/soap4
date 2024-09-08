@@ -4,7 +4,7 @@ $message_type = '';
 $clear_form = false;
 
 // Incluir la función para obtener el cliente SOAP
-include 'soapClientFactory.php';
+include 'soapClient.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Campos obligatorios, incluyendo login y contraseña

@@ -9,7 +9,7 @@ $message = '';
 $message_type = '';
 
 // Incluir la función para obtener el cliente SOAP
-include 'soapClientFactory.php';
+include 'soapClient.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tipo_cuenta = htmlspecialchars($_POST['tipo_cuenta']); // Puede ser "bolivianos" o "dólares"

@@ -9,7 +9,7 @@ $message = '';
 $message_type = '';
 
 // Incluir la función para obtener el cliente SOAP
-include 'soapClientFactory.php';
+include 'soapClient.php';
 
 try {
     // Obtener el cliente SOAP usando la función

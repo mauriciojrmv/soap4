@@ -12,7 +12,7 @@ Este proyecto implementa un sistema de registro distribuido utilizando el metodo
 
 ## Arquitectura del proyecto
 El proyecto esta dividido en tres componentes principales:
-# 1. index.php, styles.css, login.php, dashboard.php, logout.php, crear_cuenta.php, deposito.php, retiro.php, soapClientFactory.php
+# 1. index.php, styles.css, login.php, dashboard.php, logout.php, crear_cuenta.php, deposito.php, retiro.php, soapClient.php
 Estos archivos actuan como intermediario e interfaz html (el formulario que llena el usuario) que conecta con el servidor SOAP.
 
 Generacion de tokens:
@@ -113,7 +113,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 # Modo de ejecucion:
 PC1, PC2, PC3: Si se implementa en diferentes PCs, se debe cambiar la IP del servidor y puerto al cual se conectara cada cliente.
 
-Para la PC1 se cambia la ruta y puerto de direccionamiento hacia el server en **soapClientFactory.php**
+Para la PC1 se cambia la ruta y puerto de direccionamiento hacia el server en **soapClient.php**
 
 Para la PC2 se cambia el direccionamiento hacia la bd en **server.php**
 
