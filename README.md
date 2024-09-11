@@ -81,7 +81,8 @@ CREATE TABLE cuentas (
     tipo_cuenta ENUM('bolivianos', 'dolares') NOT NULL,  -- Tipo de cuenta
     token VARCHAR(255) NOT NULL,        -- Token único para la cuenta
     saldo DECIMAL(10, 2) DEFAULT 0,     -- Saldo de la cuenta, puede empezar en 0
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,      -- Fecha de creación
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP     -- fecha de actualizacion deposito retiro
 );
 
 CREATE TABLE transacciones (

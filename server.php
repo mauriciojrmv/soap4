@@ -126,6 +126,11 @@ class PersonService {
             throw new SoapFault("Server", "Nivel 3: Error - Problema al acceder a la base de datos.");
         }
     }
+
+    public function getCuentasInfo() {
+        return $this->remoteCall('getCuentasInfo', []);
+    }
+    
 }
 
 // Configuración del servidor SOAP

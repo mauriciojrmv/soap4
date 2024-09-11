@@ -150,40 +150,40 @@ class DatabaseService {
     }
 
     // Insertar una transacción de depósito
-    public function depositar($cuenta_id, $monto, $token) {
-        try {
-            // Verificar si la cuenta existe
-            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM cuentas WHERE id = :cuenta_id");
-            $stmt->execute(['cuenta_id' => $cuenta_id]);
-            $exists = $stmt->fetchColumn();
-    
-            if ($exists == 0) {
-                throw new SoapFault("Client", "Nivel 2: Error - Cuenta no encontrada.");
-            }
-    
-            // Insertar la transacción de depósito
-            $stmt = $this->pdo->prepare("
-                INSERT INTO transacciones (cuenta_id, tipo_transaccion, monto, token) 
-                VALUES (:cuenta_id, 'deposito', :monto, :token)
-            ");
-            $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
-    
-            // Actualizar el saldo de la cuenta
-            $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo + :monto WHERE id = :cuenta_id");
-            $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
-    
-            return true;
-        } catch (PDOException $e) {
-            if ($e->getCode() == '23000') {
-                throw new SoapFault("Client", "Nivel 2: Error - Esta transacción ya existe.");
-            } else {
-                throw new SoapFault("Server", "Nivel 3: Error - Problema al realizar el depósito: " . $e->getMessage());
-            }
+public function depositar($cuenta_id, $monto, $token) {
+    try {
+        // Verificar si la cuenta existe
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM cuentas WHERE id = :cuenta_id");
+        $stmt->execute(['cuenta_id' => $cuenta_id]);
+        $exists = $stmt->fetchColumn();
+
+        if ($exists == 0) {
+            throw new SoapFault("Client", "Nivel 2: Error - Cuenta no encontrada.");
+        }
+
+        // Insertar la transacción de depósito
+        $stmt = $this->pdo->prepare("
+            INSERT INTO transacciones (cuenta_id, tipo_transaccion, monto, token) 
+            VALUES (:cuenta_id, 'deposito', :monto, :token)
+        ");
+        $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
+
+        // Actualizar el saldo de la cuenta y la fecha de actualización
+        $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo + :monto, actualizado_en = NOW() WHERE id = :cuenta_id");
+        $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
+
+        return true;
+    } catch (PDOException $e) {
+        if ($e->getCode() == '23000') {
+            throw new SoapFault("Client", "Nivel 2: Error - Esta transacción ya existe.");
+        } else {
+            throw new SoapFault("Server", "Nivel 3: Error - Problema al realizar el depósito: " . $e->getMessage());
         }
     }
+}
 
     // Insertar una transacción de retiro
-    public function retirar($cuenta_id, $monto, $token) {
+public function retirar($cuenta_id, $monto, $token) {
     try {
         // Verificar si la cuenta tiene saldo suficiente
         $stmt = $this->pdo->prepare("SELECT saldo FROM cuentas WHERE id = :cuenta_id");
@@ -206,8 +206,8 @@ class DatabaseService {
         ");
         $stmt->execute(['cuenta_id' => $cuenta_id, 'monto' => $monto, 'token' => $token]);
 
-        // Actualizar el saldo de la cuenta
-        $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo - :monto WHERE id = :cuenta_id");
+        // Actualizar el saldo de la cuenta y la fecha de actualización
+        $stmt = $this->pdo->prepare("UPDATE cuentas SET saldo = saldo - :monto, actualizado_en = NOW() WHERE id = :cuenta_id");
         $stmt->execute(['monto' => $monto, 'cuenta_id' => $cuenta_id]);
 
         return true;
@@ -217,6 +217,34 @@ class DatabaseService {
         } else {
             throw new SoapFault("Server", "Nivel 3: Error - Problema al realizar el retiro: " . $e->getMessage());
         }
+    }
+}
+
+// Obtener todas las cuentas, la cuenta con más y menos saldo
+public function getCuentasInfo() {
+    try {
+        // Obtener todas las cuentas
+        $stmt = $this->pdo->prepare("SELECT id, saldo FROM cuentas");
+        $stmt->execute();
+        $cuentas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Obtener la cuenta con más saldo
+        $stmt = $this->pdo->prepare("SELECT id, saldo FROM cuentas ORDER BY saldo DESC LIMIT 1");
+        $stmt->execute();
+        $maxCuenta = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Obtener la cuenta con menos saldo
+        $stmt = $this->pdo->prepare("SELECT id, saldo FROM cuentas ORDER BY saldo ASC LIMIT 1");
+        $stmt->execute();
+        $minCuenta = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'cuentas' => $cuentas,
+            'maxCuenta' => $maxCuenta, // Contiene el id y el saldo de la cuenta con más saldo
+            'minCuenta' => $minCuenta  // Contiene el id y el saldo de la cuenta con menos saldo
+        ];
+    } catch (PDOException $e) {
+        throw new SoapFault("Server", "Nivel 3: Error - No se pudo obtener la información de las cuentas.");
     }
 }
 
