@@ -53,51 +53,57 @@ Utiliza MySQL para conectarse a la base de datos. los credenciales deben editars
 ## Creacion de la Base de datos 
 Ejecuta las siguientes sentencias SQL para crear la base de datos y la tabla:
 
-CREATE DATABASE person_db;
+-- Crear base de datos
+CREATE DATABASE IF NOT EXISTS banco_db;
+USE banco_db;
 
-USE person_db;
-
-CREATE TABLE clientes (
+-- Crear tabla clientes
+CREATE TABLE IF NOT EXISTS clientes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    apellido_paterno VARCHAR(50) NOT NULL,
-    apellido_materno VARCHAR(50) NOT NULL,
-    numero_carnet VARCHAR(15) UNIQUE NOT NULL, -- Campo obligatorio y único
+    nombre VARCHAR(100) NOT NULL,
+    apellido_paterno VARCHAR(100) NOT NULL,
+    apellido_materno VARCHAR(100) NOT NULL,
+    numero_carnet VARCHAR(20) NOT NULL UNIQUE,
     fecha_nacimiento DATE NOT NULL,
     sexo ENUM('M', 'F') NOT NULL,
-    lugar_nacimiento VARCHAR(50) NOT NULL,
+    lugar_nacimiento VARCHAR(100) NOT NULL,
     estado_civil ENUM('S', 'C', 'D', 'V') NOT NULL,
-    profesion VARCHAR(50) NOT NULL,
-    domicilio VARCHAR(100) NOT NULL,
-    login VARCHAR(50) UNIQUE NOT NULL, -- Campo obligatorio y único
-    password VARCHAR(255) NOT NULL, -- Contraseña encriptada
-    token VARCHAR(64) UNIQUE NOT NULL, -- Token único y obligatorio
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Fecha de creación
+    profesion VARCHAR(100) NOT NULL,
+    domicilio VARCHAR(255) NOT NULL,
+    login VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE cuentas (
+-- Crear tabla cuentas
+CREATE TABLE IF NOT EXISTS cuentas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    login VARCHAR(50) NOT NULL,         -- Relacionado al cliente
-    tipo_cuenta ENUM('bolivianos', 'dolares') NOT NULL,  -- Tipo de cuenta
-    token VARCHAR(255) NOT NULL,        -- Token único para la cuenta
-    saldo DECIMAL(10, 2) DEFAULT 0,     -- Saldo de la cuenta, puede empezar en 0
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,      -- Fecha de creación
-    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP     -- fecha de actualizacion deposito retiro
+    login VARCHAR(100) NOT NULL,
+    tipo_cuenta ENUM('bolivianos', 'dolares') NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    saldo DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (login) REFERENCES clientes(login) ON DELETE CASCADE
 );
 
-CREATE TABLE transacciones (
+-- Crear tabla transacciones
+CREATE TABLE IF NOT EXISTS transacciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cuenta_id INT NOT NULL,
     tipo_transaccion ENUM('deposito', 'retiro') NOT NULL,
     monto DECIMAL(10, 2) NOT NULL,
     token VARCHAR(255) NOT NULL UNIQUE,
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cuenta_id) REFERENCES cuentas(id)
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cuenta_id) REFERENCES cuentas(id) ON DELETE CASCADE
 );
 
 
+
 ### En caso de equivocarse y querer eliminar alguna tabla
-USE person_db;
+USE banco_db;
 
 -- Desactivar las restricciones de claves foráneas temporalmente para eliminar las tablas
 SET FOREIGN_KEY_CHECKS = 0;

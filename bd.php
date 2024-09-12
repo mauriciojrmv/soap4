@@ -4,7 +4,7 @@ class DatabaseService {
 
     public function __construct() {
         try {
-            $dsn = 'mysql:host=localhost;dbname=person_db';
+            $dsn = 'mysql:host=localhost;dbname=banco_db';
             $username = 'root';
             $password = '';
             $this->pdo = new PDO($dsn, $username, $password);
